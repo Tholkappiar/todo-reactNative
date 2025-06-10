@@ -6,8 +6,12 @@ const index = () => {
     return (
         <View>
             <Text>this is the initial page</Text>
-            <Link href="/screens">Go to home</Link>
-            <Link href="/screens/settings">Go to settings</Link>
+            <Link href="/screens" push={true}>
+                Go to home
+            </Link>
+            <Link href="/screens/settings" push={true}>
+                Go to settings
+            </Link>
         </View>
     );
 };

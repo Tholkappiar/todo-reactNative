@@ -6,7 +6,9 @@ const settings = () => {
     return (
         <View>
             <Text>settings</Text>
-            <Link href="/">Go to main page</Link>
+            <Link href="/" push={true}>
+                Go to main page
+            </Link>
         </View>
     );
 };

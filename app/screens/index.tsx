@@ -6,7 +6,9 @@ const home = () => {
     return (
         <View>
             <Text>home</Text>
-            <Link href="/">Go to index</Link>
+            <Link href="/" push={true}>
+                Go to index
+            </Link>
         </View>
     );
 };
