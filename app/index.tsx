@@ -1,19 +1,13 @@
-import { Link } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Todo from "~/components/Todo";
 
-const index = () => {
+const Index = () => {
     return (
-        <View>
-            <Text>this is the initial page</Text>
-            <Link href="/screens" push={true}>
-                Go to home
-            </Link>
-            <Link href="/screens/settings" push={true}>
-                Go to settings
-            </Link>
-        </View>
+        <SafeAreaView className="flex-1">
+            <Todo />
+        </SafeAreaView>
     );
 };
 
-export default index;
+export default Index;
