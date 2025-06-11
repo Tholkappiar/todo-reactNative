@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "convex/react";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
     KeyboardAvoidingView,
     NativeSyntheticEvent,
@@ -49,6 +49,15 @@ const Todo = () => {
         setTodo("");
     }
 
+    const sortedTodos = useMemo(() => {
+        return todos.sort((a, b) => {
+            if (a.completed !== b.completed) {
+                return Number(a.completed) - Number(b.completed);
+            }
+            return a._creationTime - b._creationTime;
+        });
+    }, [todos]);
+
     function handleDeletePress(todoId: Id<"todo">) {
         setDialogStatus(true);
         setSelectedTodoId(todoId);
@@ -79,7 +88,7 @@ const Todo = () => {
                     </Text>
                 )}
                 <View className="justify-start mx-10 gap-3">
-                    {todos.map((todo) => (
+                    {sortedTodos.map((todo) => (
                         <View
                             key={todo._id}
                             className="flex-row justify-between items-center"
