@@ -6,6 +6,7 @@ import {
     Theme,
     ThemeProvider,
 } from "@react-navigation/native";
+import { PortalHost } from "@rn-primitives/portal";
 import { Stack } from "expo-router";
 import * as React from "react";
 import { Platform } from "react-native";
@@ -52,6 +53,7 @@ export default function RootLayout() {
         <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
             {/* <StatusBar style={isDarkColorScheme ? "light" : "dark"} /> */}
             <Stack screenOptions={{ headerShown: false }} />
+            <PortalHost />
         </ThemeProvider>
     );
 }

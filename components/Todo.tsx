@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Plus } from "~/lib/icons/Plus";
 import { Trash } from "~/lib/icons/Trash";
+import { AlertDialogScreen } from "./AlertExample";
 import { Checkbox } from "./ui/checkbox";
 
 type todosType = {
@@ -22,6 +23,9 @@ const Todo = () => {
     const [todos, setTodos] = useState<todosType[]>([]);
     const [todo, setTodo] = useState<string>("");
     const [count, setCount] = useState<number>(1);
+
+    const [dialogStatus, setDialogStatus] = useState<boolean>(false);
+    const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
 
     function changeChecked(id: number) {
         setTodos((prev) => {
@@ -60,8 +64,24 @@ const Todo = () => {
         }
     }
 
-    function onTodoDelete(id: number) {
-        setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    function handleDeletePress(todoId: number) {
+        setDialogStatus(true);
+        setSelectedTodoId(todoId);
+    }
+
+    function confirmDelete() {
+        if (selectedTodoId != null) {
+            setTodos((prev) =>
+                prev.filter((todo) => todo.id !== selectedTodoId)
+            );
+        }
+        setSelectedTodoId(null);
+        setDialogStatus(false);
+    }
+
+    function cancelDelete() {
+        setSelectedTodoId(null);
+        setDialogStatus(false);
     }
 
     return (
@@ -79,9 +99,9 @@ const Todo = () => {
                     {todos.map((todo) => (
                         <View
                             key={todo.id}
-                            className="flex-row justify-between"
+                            className="flex-row justify-between items-center"
                         >
-                            <View className="flex-row gap-4">
+                            <View className="flex-row gap-4 items-center">
                                 <Checkbox
                                     checked={todo.completed}
                                     onCheckedChange={() =>
@@ -98,7 +118,7 @@ const Todo = () => {
                                 </Text>
                             </View>
                             <TouchableOpacity
-                                onPress={() => onTodoDelete(todo.id)}
+                                onPress={() => handleDeletePress(todo.id)}
                             >
                                 <Trash size={20} className="text-red-500" />
                             </TouchableOpacity>
@@ -106,7 +126,11 @@ const Todo = () => {
                     ))}
                 </View>
             </View>
-
+            <AlertDialogScreen
+                dialogStatusFlag={dialogStatus}
+                onConfirm={confirmDelete}
+                onCancel={cancelDelete}
+            />
             <KeyboardAvoidingView
                 className="flex-row items-center gap-2 m-6"
                 behavior="padding"
