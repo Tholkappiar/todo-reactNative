@@ -7,6 +7,7 @@ import {
     ThemeProvider,
 } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { Stack } from "expo-router";
 import * as React from "react";
 import { Platform } from "react-native";
@@ -26,6 +27,10 @@ export {
     // Catch any errors thrown by the Layout component.
     ErrorBoundary,
 } from "expo-router";
+
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
+    unsavedChangesWarning: false,
+});
 
 export default function RootLayout() {
     const hasMounted = React.useRef(false);
@@ -51,9 +56,11 @@ export default function RootLayout() {
 
     return (
         <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-            {/* <StatusBar style={isDarkColorScheme ? "light" : "dark"} /> */}
-            <Stack screenOptions={{ headerShown: false }} />
-            <PortalHost />
+            <ConvexProvider client={convex}>
+                {/* <StatusBar style={isDarkColorScheme ? "light" : "dark"} /> */}
+                <Stack screenOptions={{ headerShown: false }} />
+                <PortalHost />
+            </ConvexProvider>
         </ThemeProvider>
     );
 }

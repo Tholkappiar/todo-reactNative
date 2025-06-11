@@ -1,3 +1,4 @@
+import { useMutation, useQuery } from "convex/react";
 import React, { useState } from "react";
 import {
     KeyboardAvoidingView,
@@ -8,39 +9,31 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
 import { Plus } from "~/lib/icons/Plus";
 import { Trash } from "~/lib/icons/Trash";
 import { AlertDialogScreen } from "./AlertExample";
 import { Checkbox } from "./ui/checkbox";
 
-type todosType = {
-    id: number;
-    title: string;
-    completed: boolean;
-};
-
 const Todo = () => {
-    const [todos, setTodos] = useState<todosType[]>([]);
+    const todos = useQuery(api.todo.getTodos) || [];
+    const updateTodo = useMutation(api.todo.updateTodo);
+    const postTodo = useMutation(api.todo.postTodo);
+    const deleteTodo = useMutation(api.todo.deleteTodo);
+
     const [todo, setTodo] = useState<string>("");
-    const [count, setCount] = useState<number>(1);
 
     const [dialogStatus, setDialogStatus] = useState<boolean>(false);
-    const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
+    const [selectedTodoId, setSelectedTodoId] = useState<Id<"todo"> | null>(
+        null
+    );
 
-    function changeChecked(id: number) {
-        setTodos((prev) => {
-            const updated = prev.map((todo) =>
-                todo.id === id ? { ...todo, completed: !todo.completed } : todo
-            );
-
-            updated.sort((a, b) => {
-                if (Number(a.completed) !== Number(b.completed)) {
-                    return Number(a.completed) - Number(b.completed);
-                }
-                return Number(a.id) - Number(b.id);
-            });
-            return updated;
-        });
+    async function changeChecked(id: Id<"todo">) {
+        const currentTodo = todos.find((todo) => todo._id === id);
+        if (currentTodo) {
+            await updateTodo({ id, completed: !currentTodo.completed });
+        }
     }
 
     function onChangeInput(
@@ -49,31 +42,21 @@ const Todo = () => {
         setTodo(event.nativeEvent.text.trim());
     }
 
-    function onTodoSubmit() {
+    async function onTodoSubmit() {
         if (todo.length > 0) {
-            setTodos((prev) => [
-                ...prev,
-                {
-                    id: count,
-                    title: todo,
-                    completed: false,
-                },
-            ]);
-            setCount((prev) => prev + 1);
-            setTodo("");
+            await postTodo({ title: todo });
         }
+        setTodo("");
     }
 
-    function handleDeletePress(todoId: number) {
+    function handleDeletePress(todoId: Id<"todo">) {
         setDialogStatus(true);
         setSelectedTodoId(todoId);
     }
 
-    function confirmDelete() {
+    async function confirmDelete() {
         if (selectedTodoId != null) {
-            setTodos((prev) =>
-                prev.filter((todo) => todo.id !== selectedTodoId)
-            );
+            await deleteTodo({ _id: selectedTodoId });
         }
         setSelectedTodoId(null);
         setDialogStatus(false);
@@ -98,14 +81,14 @@ const Todo = () => {
                 <View className="justify-start mx-10 gap-3">
                     {todos.map((todo) => (
                         <View
-                            key={todo.id}
+                            key={todo._id}
                             className="flex-row justify-between items-center"
                         >
                             <View className="flex-row gap-4 items-center">
                                 <Checkbox
                                     checked={todo.completed}
                                     onCheckedChange={() =>
-                                        changeChecked(todo.id)
+                                        changeChecked(todo._id)
                                     }
                                     className="bg-white"
                                 />
@@ -118,7 +101,7 @@ const Todo = () => {
                                 </Text>
                             </View>
                             <TouchableOpacity
-                                onPress={() => handleDeletePress(todo.id)}
+                                onPress={() => handleDeletePress(todo._id)}
                             >
                                 <Trash size={20} className="text-red-500" />
                             </TouchableOpacity>
