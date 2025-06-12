@@ -28,6 +28,7 @@ export {
     ErrorBoundary,
 } from "expo-router";
 
+console.log("this is the env", process.env.EXPO_PUBLIC_CONVEX_URL);
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
     unsavedChangesWarning: false,
 });
