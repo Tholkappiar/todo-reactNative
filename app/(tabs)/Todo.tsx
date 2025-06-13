@@ -13,11 +13,14 @@ import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 import { Plus } from "~/lib/icons/Plus";
 import { Trash } from "~/lib/icons/Trash";
-import { AlertDialogScreen } from "./AlertExample";
-import { Checkbox } from "./ui/checkbox";
+import { AlertDialogScreen } from "../../components/AlertExample";
+import { Checkbox } from "../../components/ui/checkbox";
 
 const Todo = () => {
-    const todos = useQuery(api.todo.getTodos) || [];
+    const user = useQuery(api.user.getUserIdentity);
+    const userID = String(user?._id);
+    const todos =
+        useQuery(api.todo.getTodos, user ? { id: userID } : "skip") || [];
     const updateTodo = useMutation(api.todo.updateTodo);
     const postTodo = useMutation(api.todo.postTodo);
     const deleteTodo = useMutation(api.todo.deleteTodo);
@@ -43,10 +46,10 @@ const Todo = () => {
     }
 
     async function onTodoSubmit() {
-        if (todo.length > 0) {
-            await postTodo({ title: todo });
+        if (todo.length > 0 && user?._id) {
+            await postTodo({ id: user._id, title: todo });
+            setTodo("");
         }
-        setTodo("");
     }
 
     const sortedTodos = useMemo(() => {

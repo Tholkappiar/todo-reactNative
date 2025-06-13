@@ -1,5 +1,6 @@
 import "./global.css";
 
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import {
     DarkTheme,
     DefaultTheme,
@@ -7,10 +8,12 @@ import {
     ThemeProvider,
 } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { ConvexReactClient } from "convex/react";
 import { Stack } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import * as React from "react";
 import { Platform } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { NAV_THEME } from "~/lib/constants";
 import { useColorScheme } from "~/lib/useColorScheme";
 
@@ -28,10 +31,15 @@ export {
     ErrorBoundary,
 } from "expo-router";
 
-console.log("this is the env", process.env.EXPO_PUBLIC_CONVEX_URL);
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
     unsavedChangesWarning: false,
 });
+
+const secureStorage = {
+    getItem: SecureStore.getItemAsync,
+    setItem: SecureStore.setItemAsync,
+    removeItem: SecureStore.deleteItemAsync,
+};
 
 export default function RootLayout() {
     const hasMounted = React.useRef(false);
@@ -57,11 +65,24 @@ export default function RootLayout() {
 
     return (
         <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-            <ConvexProvider client={convex}>
-                {/* <StatusBar style={isDarkColorScheme ? "light" : "dark"} /> */}
-                <Stack screenOptions={{ headerShown: false }} />
-                <PortalHost />
-            </ConvexProvider>
+            <SafeAreaProvider>
+                <SafeAreaView className="flex-1">
+                    <ConvexAuthProvider
+                        client={convex}
+                        storage={
+                            Platform.OS === "android" || Platform.OS === "ios"
+                                ? secureStorage
+                                : undefined
+                        }
+                    >
+                        {/* <StatusBar style={isDarkColorScheme ? "light" : "dark"} /> */}
+                        {/* <Stack screenOptions={{ headerShown: false }} /> */}
+                        <Stack screenOptions={{ headerShown: false }} />
+
+                        <PortalHost />
+                    </ConvexAuthProvider>
+                </SafeAreaView>
+            </SafeAreaProvider>
         </ThemeProvider>
     );
 }

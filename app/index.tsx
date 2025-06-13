@@ -1,12 +1,21 @@
+import { Authenticated, Unauthenticated, useConvexAuth } from "convex/react";
+import { Redirect } from "expo-router";
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import Todo from "~/components/Todo";
+import { View } from "react-native";
+import SignIn from "./Signin";
 
 const Index = () => {
+    const { isAuthenticated } = useConvexAuth();
+    console.log("is Authenticated : ", isAuthenticated);
     return (
-        <SafeAreaView className="flex-1">
-            <Todo />
-        </SafeAreaView>
+        <View className="flex-1">
+            <Authenticated>
+                <Redirect href="/(tabs)/Todo" />
+            </Authenticated>
+            <Unauthenticated>
+                <SignIn />
+            </Unauthenticated>
+        </View>
     );
 };
 
