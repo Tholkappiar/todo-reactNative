@@ -1,31 +1,15 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
-import { router } from "expo-router";
 import React from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { api } from "~/convex/_generated/api";
 
 const Profile = () => {
     const user = useQuery(api.user.getUserIdentity);
-    console.log(user);
     const { signOut } = useAuthActions();
 
-    const handleSignOut = () => {
-        Alert.alert("Sign Out", "Are you sure you want to sign out?", [
-            {
-                text: "Cancel",
-                style: "cancel",
-            },
-            {
-                text: "Sign Out",
-                style: "destructive",
-                onPress: () => {
-                    void signOut();
-                    router.dismissAll();
-                    router.push("/Signin");
-                },
-            },
-        ]);
+    const handleSignOut = async () => {
+        await signOut();
     };
 
     const formatDate = (timestamp: number) => {

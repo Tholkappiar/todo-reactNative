@@ -13,8 +13,8 @@ import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 import { Plus } from "~/lib/icons/Plus";
 import { Trash } from "~/lib/icons/Trash";
-import { AlertDialogScreen } from "../../components/AlertExample";
-import { Checkbox } from "../../components/ui/checkbox";
+import { AlertDialogScreen } from "../../../components/AlertExample";
+import { Checkbox } from "../../../components/ui/checkbox";
 
 const Todo = () => {
     const user = useQuery(api.user.getUserIdentity);
@@ -42,12 +42,12 @@ const Todo = () => {
     function onChangeInput(
         event: NativeSyntheticEvent<TextInputChangeEventData>
     ) {
-        setTodo(event.nativeEvent.text.trim());
+        setTodo(event.nativeEvent.text);
     }
 
     async function onTodoSubmit() {
         if (todo.length > 0 && user?._id) {
-            await postTodo({ id: user._id, title: todo });
+            await postTodo({ id: user._id, title: todo.trim() });
             setTodo("");
         }
     }

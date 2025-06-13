@@ -8,6 +8,18 @@ export default function SignIn() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    async function Authenticate() {
+        try {
+            await signIn("password", {
+                email,
+                password,
+                flow: step,
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     return (
         <View className="flex-1 justify-center items-center px-6 bg-white">
             <View className="w-full max-w-md space-y-4">
@@ -31,13 +43,7 @@ export default function SignIn() {
 
                 <Pressable
                     className="bg-blue-600 rounded-lg py-3 items-center"
-                    onPress={() => {
-                        void signIn("password", {
-                            email,
-                            password,
-                            flow: step,
-                        });
-                    }}
+                    onPress={Authenticate}
                 >
                     <Text className="text-white font-semibold text-base">
                         {step === "signIn" ? "Sign in" : "Sign up"}
